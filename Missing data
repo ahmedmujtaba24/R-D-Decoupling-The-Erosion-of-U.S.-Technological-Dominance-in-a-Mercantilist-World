@@ -1,0 +1,29 @@
+__________________________________________________________________________________
+#Unemployment
+
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+data = {
+    'Year': list(range(1978, 2025)),
+    'Unemployment': [
+        5.3, 5.4, 4.9, 3.8, 3.2, 2.3, 1.9, 1.8, 2, 2, 2, 2.6, 2.5, 2.3, 2.3,
+        2.6, 2.8, 2.9, 3, 3.1, 3.1, 3.1, 3.707, 3.6, 4, 4.3, 4.2, 4.2, 4.1,
+        4, 4.2, 4.3, 4.1, 4.1, 4.1, 4.05, 4.1, None, 3.9, 4.93, 5.15, 5.61,
+        5.11, None, None, None, None
+    ]
+}
+
+df = pd.DataFrame(data)
+
+# Forward fill then backward fill remaining gaps
+df['Filled'] = df['Unemployment'].interpolate(method='linear')
+
+print("Imputed Missing Values (Linear Interpolation):")
+print(df[df['Unemployment'].isnull()][['Year', 'Filled']].to_string(index=False))
+
+df.to_csv('unemployment_filled.csv', index=False)
+
+__________________________________________________________________________________
+
