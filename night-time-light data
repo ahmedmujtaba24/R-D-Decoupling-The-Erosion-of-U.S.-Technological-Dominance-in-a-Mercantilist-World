@@ -1,0 +1,64 @@
+#China 
+
+// Define China boundary
+var china = ee.FeatureCollection("FAO/GAUL/2015/level0").filter(ee.Filter.eq('ADM0_NAME', 'China'));
+
+// Load VIIRS DNB data
+var viirs = ee.ImageCollection("NOAA/VIIRS/DNB/MONTHLY_V1/VCMSLCFG")
+                  .filterDate('2014-01-01', '2024-12-31')
+                  .select('avg_rad');
+
+// Function to calculate mean radiance over China
+var getMeanRadiance = function(image) {
+  var meanValue = image.reduceRegion({
+    reducer: ee.Reducer.mean(),
+    geometry: china,
+    scale: 500,
+    maxPixels: 1e10
+  });
+  return image.set('date', image.date()).set('mean_radiance', meanValue.get('avg_rad'));
+};
+
+// Map over the collection to extract values
+var timeSeries = viirs.map(getMeanRadiance);
+
+// Export as CSV
+Export.table.toDrive({
+  collection: timeSeries.select(['mean_radiance']),
+  description: 'China_AvgRadiance_2014_2024',
+  folder: 'GEE_Exports',
+  fileNamePrefix: 'avg_radiance_china',
+  fileFormat: 'CSV'
+});
+
+// Print the time series
+print('Time Series of Average Radiance:', timeSeries);
+
+______________________________________________________________________________________________________
+#United States 
+
+import geopandas as gpd
+import pandas as pd
+from rasterstats import zonal_stats
+
+states_shp_path = "cb_2018_us_state_500k.shp"
+states = gpd.read_file(states_shp_path)
+
+years = list(range(2014, 2024))
+tif_files = [f"VNL_{year}.tif" for year in years]  # Replace with actual file paths
+
+df = pd.DataFrame({'State': states['NAME']})
+
+for year, tif in zip(years, tif_files):
+    print(f"Processing {year}...")
+    stats = zonal_stats(states, tif, stats="mean", all_touched=True)
+    df[f'avg_radiance_{year}'] = [s['mean'] for s in stats]
+
+df['Avg_Radiance_2014_2023'] = df[[f'avg_radiance_{y}' for y in years]].mean(axis=1)
+
+df['Z_Score'] = (df['Avg_Radiance_2014_2023'] - df['Avg_Radiance_2014_2023'].mean()) / df['Avg_Radiance_2014_2023'].std()
+df['Min_Max_Score'] = (df['Avg_Radiance_2014_2023'] - df['Avg_Radiance_2014_2023'].min()) / (df['Avg_Radiance_2014_2023'].max() - df['Avg_Radiance_2014_2023'].min())
+
+df[['State', 'Avg_Radiance_2014_2023', 'Z_Score', 'Min_Max_Score']].to_csv("ntl_state_avg_2014_2023.csv", index=False)
+
+print("Processing complete. File saved as 'ntl_state_avg_2014_2023.csv'")
