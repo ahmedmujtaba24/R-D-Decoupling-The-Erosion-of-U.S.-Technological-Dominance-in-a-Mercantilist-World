@@ -30,3 +30,53 @@ fig.tight_layout()
 
 plt.show()
 ______________________________________________________________________________________________________________________________________________________
+
+import plotly.graph_objects as go
+import pandas as pd
+
+data = {
+    "year": [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023],
+    "GDP(Trillions_USD)": [17.608, 18.295, 18.805, 19.612, 20.657, 21.54, 21.354, 23.681, 26.007, 27.721],
+    "Shadow_Economy_percent": [8.7, 8.5, 8.2, 8.1, 8.1, 7.9, 7.8, 7.7, 7.6, 7.5]
+}
+df = pd.DataFrame(data)
+
+gdp_trace = go.Scatter(
+    x=df['year'], y=df['GDP(Trillions_USD)'], 
+    mode='lines+markers',
+    name='GDP (tril USD)',
+    marker=dict(symbol='circle', color='#1FB8CD', size=8, line=dict(width=2, color='#1FB8CD')),
+    line=dict(color='#1FB8CD', width=3),
+    cliponaxis=False,
+    yaxis='y1',
+    hovertemplate='Year: %{x}<br>GDP: %{y}T'
+)
+
+shadow_trace = go.Scatter(
+    x=df['year'], y=df['Shadow_Economy_percent'],
+    mode='lines+markers',
+    name='Shadow % GDP',
+    marker=dict(symbol='x', color='#DB4545', size=8, line=dict(width=2, color='#DB4545')),
+    line=dict(color='#DB4545', width=3, dash='dash'),
+    cliponaxis=False,
+    yaxis='y2',
+    hovertemplate='Year: %{x}<br>Shadow: %{y}%'
+)
+
+fig = go.Figure([gdp_trace, shadow_trace])
+
+fig.update_layout(
+    title='US GDP & Shadow GDP % 2014-2023',
+    xaxis=dict(title='Year', tickmode='array', tickvals=df['year']),
+    yaxis=dict(title='GDP (tril USD)', tickformat='.2f'),
+    yaxis2=dict(title='Shadow (%)', overlaying='y', side='right'),
+)
+fig.update_xaxes(tickvals=df['year'], title_text='Year', showgrid=True)
+fig.update_yaxes(title_text='GDP (tril USD)', showgrid=True, secondary_y=False)
+fig.update_yaxes(title_text='Shadow (%)', showgrid=False, secondary_y=True)
+
+fig.update_layout(
+    legend=dict(orientation='h', yanchor='bottom', y=1.05, xanchor='center', x=0.5)
+)
+
+fig.write_image('us_gdp_shadow_2014_2023.png')
