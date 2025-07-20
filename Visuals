@@ -80,3 +80,39 @@ fig.update_layout(
 )
 
 fig.write_image('us_gdp_shadow_2014_2023.png')
+
+______________________________________________________________________________________________________________________________________________________
+
+years = list(range(2014, 2025))
+gdp_trillions = [17.608, 18.295, 18.805, 19.612, 20.657, 21.54, 21.354, 23.681, 26.007, 27.721, 29.185]
+shadow_economy_percent = [8.7, 8.5, 8.2, 8.1, 8.1, 7.9, 7.8, 7.7, 7.6, 7.5, None]
+
+import numpy as np
+shadow_economy_percent[-1] = np.nan
+
+fig, ax1 = plt.subplots(figsize=(10,6))
+
+color = 'tab:blue'
+ax1.set_xlabel('Year')
+ax1.set_ylabel('GDP (Trillions USD)', color=color)
+ax1.plot(years, gdp_trillions, color=color, marker='o', label='GDP (Trillions USD)')
+ax1.tick_params(axis='y', labelcolor=color)
+ax1.set_xticks(years)
+
+ax2 = ax1.twinx()
+color = 'tab:red'
+ax2.set_ylabel('Shadow Economy (% of GDP)', color=color)
+ax2.plot(years, shadow_economy_percent, color=color, marker='x', linestyle='dashed', label='Shadow Economy (% of GDP)')
+ax2.tick_params(axis='y', labelcolor=color)
+
+plt.title('US GDP and Shadow Economy Trends (2014-2024)')
+fig.tight_layout()
+
+lines1, labels1 = ax1.get_legend_handles_labels()
+lines2, labels2 = ax2.get_legend_handles_labels()
+ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left')
+
+plt.show()
+
+______________________________________________________________________________________________________________________________________________________
+
