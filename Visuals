@@ -1,0 +1,32 @@
+GDP vs Shadow Economy 
+
+years = list(range(2014, 2025))
+gdp_trillions = [17.608, 18.295, 18.805, 19.612, 20.657, 21.54, 21.354, 23.681, 26.007, 27.721, 29.185]
+shadow_economy_percent = [8.7, 8.5, 8.2, 8.1, 8.1, 7.9, 7.8, 7.7, 7.6, 7.5, None]  # 2024 missing
+
+df = pd.DataFrame({
+    'Year': years,
+    'GDP (Trillions USD)': gdp_trillions,
+    'Shadow Economy (% of GDP)': shadow_economy_percent
+})
+
+fig, ax1 = plt.subplots(figsize=(10, 6))
+
+color_gdp = 'tab:blue'
+ax1.set_xlabel('Year')
+ax1.set_ylabel('GDP (Trillions USD)', color=color_gdp)
+ax1.plot(df['Year'], df['GDP (Trillions USD)'], color=color_gdp, marker='o', label='GDP (Trillions USD)')
+ax1.tick_params(axis='y', labelcolor=color_gdp)
+ax1.grid(True)
+
+ax2 = ax1.twinx()
+color_shadow = 'tab:red'
+ax2.set_ylabel('Shadow Economy (% of GDP)', color=color_shadow)
+ax2.plot(df['Year'][:-1], df['Shadow Economy (% of GDP)'][:-1], color=color_shadow, marker='x', linestyle='--', label='Shadow Economy (% of GDP)')
+ax2.tick_params(axis='y', labelcolor=color_shadow)
+
+plt.title('US GDP and Shadow Economy (% of GDP) (2014-2023)')
+fig.tight_layout()
+
+plt.show()
+______________________________________________________________________________________________________________________________________________________
