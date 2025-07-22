@@ -98,4 +98,47 @@ combined_prob = prob_tax_above * prob_shadow_above
 
 _________________________________________________________________________________________________________________________________________________________________
 #Question 4
-# 
+# Will the United States' federal tax revenue increase by at least 15% in real terms between 2023 and 2028 as a result of increased formalization of the economy?
+
+import numpy as np
+import pandas as pd
+
+# For robustness, gather baseline data:
+# Assume baseline 2023 nominal federal tax revenue = X (unknown absolute amount), but percent of GDP = 12.6%
+# GDP nominal in 2023 ~ 27.721 trillion USD
+
+nominal_tax_rev_2023 = 27.721 * 0.126  # Trillions USD
+
+# Assumptions needed:
+# 1. Project nominal GDP growth 2023-2028 for US
+# 2. Project tax revenue as % of GDP in 2028
+# 3. Project inflation 2023-2028 to adjust nominal tax revenue to real
+years = np.arange(2023, 2029)
+
+gdp_growth_rate = 0.025
+
+inflation_rate = 0.025
+
+def project_gdp(base_gdp, years, growth_rate):
+    return base_gdp * (1 + growth_rate) ** (years - years[0])
+
+def project_tax_revenue_pct_gdp(base_pct, years, annual_change):
+    return base_pct * (1 + annual_change) ** (years - years[0])
+
+projected_gdp = project_gdp(27.721, years, gdp_growth_rate)
+
+projected_tax_revenue_pct_gdp = np.full_like(years, 0.126)
+
+projected_nominal_tax_revenue = projected_gdp * projected_tax_revenue_pct_gdp
+
+projected_real_tax_revenue = projected_nominal_tax_revenue / ((1 + inflation_rate) ** (years - years[0]))
+
+real_growth = (projected_real_tax_revenue[-1] - projected_real_tax_revenue[0]) / projected_real_tax_revenue[0]
+
+projected_tax_revenue_pct_gdp_increase = project_tax_revenue_pct_gdp(0.126, years, 0.01)
+projected_nominal_tax_revenue_increase = projected_gdp * projected_tax_revenue_pct_gdp_increase
+projected_real_tax_revenue_increase = projected_nominal_tax_revenue_increase / ((1 + inflation_rate) ** (years - years[0]))
+real_growth_increase = (projected_real_tax_revenue_increase[-1] - projected_real_tax_revenue_increase[0]) / projected_real_tax_revenue_increase[0]
+
+real_growth, real_growth_increase
+
