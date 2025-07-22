@@ -24,3 +24,45 @@ model = sm.OLS(Y, X).fit()
 model.summary()
 
 ___________________________________________________________________________
+
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+us_data = {
+    'Year': list(range(2014, 2024)),
+    'TaxRev': [10.46, 10.90, 11.18, 10.85, 11.50, 9.93, 9.88, 10.15, 11.39, 12.60],
+    'LFPR': [68.754, 68.638, 68.794, 68.715, 68.715, 68.821, 67.396, 67.359, 67.551, 67.552],
+    'Inflation': [1.62, 0.12, 1.26, 2.13, 2.44, 1.81, 1.23, 4.70, 8.00, 4.12],
+    'Unemployment': [7.38, 6.17, 5.28, 4.87, 4.36, 3.90, 3.67, 8.06, 5.35, 3.65],
+    'InformalEmpRate': [18.0, 17.6, 17.3, 17.1, 16.8, 16.5, 16.2, 15.9, 15.7, 15.5]
+}
+
+us_df = pd.DataFrame(us_data)
+
+X = us_df[['TaxRev', 'LFPR', 'Inflation', 'Unemployment']]
+y = us_df['InformalEmpRate']
+
+model = LinearRegression().fit(X, y)
+predicted_shadow = model.predict(X)
+
+r_squared = model.score(X, y)
+
+coefficients = model.coef_
+intercept = model.intercept_
+
+output = {
+    'R_squared': r_squared * 100,
+    'Coefficients': {
+        'TaxRev': coefficients[0],
+        'LFPR': coefficients[1],
+        'Inflation': coefficients[2],
+        'Unemployment': coefficients[3]
+    },
+    'Intercept': intercept,
+    'Predicted_Shadow_Employment_Rate': predicted_shadow.tolist(),
+    'Actual_Shadow_Employment_Rate': y.tolist(),
+    'Years': us_df['Year'].tolist()
+}
+
+output
