@@ -53,3 +53,23 @@ ________________________________________________________________________________
 #Question 2
 #2.	There is a 65% chance that by 2030, the U.S. will reduce its shadow economy to below 7% of GDP, while China’s remains above 15%
 
+def decimal_to_binary_fraction(decimal_prob, bits=8):
+    result = '0.'
+    frac = decimal_prob
+    for _ in range(bits):
+        frac *= 2
+        bit = int(frac // 1)
+        if bit == 1:
+            frac -= 1
+        result += str(bit)
+        if frac == 0:
+            break
+    return result
+
+prob_decimal = 0.75
+prob_binary = decimal_to_binary_fraction(prob_decimal, 8)
+
+prob_binary
+
+_________________________________________________________________________________________________________________________________________________________________
+
