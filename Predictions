@@ -1,0 +1,55 @@
+Predictions
+_________________________________________________________________________________________________________________________________________________________________
+#Prediction 1
+#There is a 75% chance that by 2028, the absolute size of China’s shadow economy will exceed that of the United States by over $1 trillion.
+
+import numpy as np
+import pandas as pd
+
+years = np.arange(2014, 2024)
+us_sh = np.array([1.5329, 1.5551, 1.5410, 1.5896, 1.6722, 1.7017, 1.6656, 1.8234, 1.9765, 2.0791])
+china_sh = np.array([1.886, 1.947, 1.943, 2.105, 2.334, 2.356, 2.380, 2.833, 2.807, 2.757])
+
+data = pd.DataFrame({'Year':years, 'US': us_sh, 'China': china_sh})
+data['Gap'] = data['China'] - data['US']
+
+from sklearn.linear_model import LinearRegression
+
+X = data['Year'].values.reshape(-1,1)
+y_us = data['US'].values
+sy = data['China'].values
+
+gap = data['Gap'].values
+
+model_us = LinearRegression().fit(X, y_us)
+model_china = LinearRegression().fit(X, sy)
+model_gap = LinearRegression().fit(X, gap)
+
+future_years = np.arange(2024, 2029).reshape(-1,1)
+
+proj_us = model_us.predict(future_years)
+proj_china = model_china.predict(future_years)
+proj_gap = model_gap.predict(future_years)
+
+us_pred = model_us.predict(X)
+china_pred = model_china.predict(X)
+gap_pred = model_gap.predict(X)
+
+residuals_gap = gap - gap_pred
+std_gap = np.std(residuals_gap)
+mean_gap_2028 = proj_gap[-1]
+
+from scipy.stats import norm
+
+threshold = 1.0 # trillion USD
+
+prob = 1 - norm.cdf(threshold, loc=mean_gap_2028, scale=std_gap)
+
+projection_2028 = {'Year': 2028, 'US': proj_us[-1], 'China': proj_china[-1], 'Gap': mean_gap_2028, 'Prob Gap > 1T': prob}
+
+projection_2028, prob, format(prob, '.4f'), bin(int(prob*256))
+
+_________________________________________________________________________________________________________________________________________________________________
+#Question 2
+#2.	There is a 65% chance that by 2030, the U.S. will reduce its shadow economy to below 7% of GDP, while China’s remains above 15%
+
