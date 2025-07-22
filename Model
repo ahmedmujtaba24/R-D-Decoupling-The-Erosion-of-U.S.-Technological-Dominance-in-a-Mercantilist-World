@@ -66,3 +66,50 @@ output = {
 }
 
 output
+
+___________________________________________________________________________
+
+china_data = {
+    'Year': list(range(2014, 2024)),
+    'TaxRev': [9.73, 9.50, 9.19, 8.95, 9.25, 8.89, 8.33, 7.92, 7.80, 7.52],
+    'LFPR': [76.35, 75.88, 75.33, 74.65, 73.95, 73.38, 71.92, 72.92, 71.59, 71.60],
+    'Inflation': [0.45, 1.25, 0.72, 0.69, 0.36, -1.11, 2.43, 4.09, 5.28, 4.39],
+    'Unemployment': [4.10, 4.00, 3.90, 4.93, 5.15, 5.61, 5.11, 4.82, 4.53, 4.24],
+    'GDPGrowth': [7.46, 6.98, 6.77, 6.89, 6.76, 6.07, 2.34, 8.57, 3.13, 5.41],
+    'InformalEmpRate': [61.2, 60.8, 60.1, 59.3, 58.5, 57.6, 56.8, 55.9, 55.0, 54.4],
+    'SelfEmpRate': [50.2, 49.8, 48.9, 48.1, 47.5, 46.9, 46.2, 45.8, 45.5, 45.3],
+    'NightLights': [5.2, 5.5, 5.8, 6.1, 6.4, 6.7, 6.5, 6.6, 6.7, 6.8]
+}
+
+china_df = pd.DataFrame(china_data)
+
+# X_c (causes)
+X_c = china_df[['TaxRev', 'LFPR', 'Inflation', 'Unemployment', 'GDPGrowth']]
+max_nl = china_df['NightLights'].max()
+scaled_night_lights = (china_df['NightLights'] / max_nl) * 100
+
+y_c = (china_df['InformalEmpRate'] + china_df['SelfEmpRate'] + scaled_night_lights) / 3
+
+model_c = LinearRegression().fit(X_c, y_c)
+predicted_shadow_c = model_c.predict(X_c)
+r_squared_c = model_c.score(X_c, y_c)
+
+coefficients_c = model_c.coef_
+intercept_c = model_c.intercept_
+
+output_c = {
+    'R_squared': r_squared_c * 100,
+    'Coefficients': {
+        'TaxRev': coefficients_c[0],
+        'LFPR': coefficients_c[1],
+        'Inflation': coefficients_c[2],
+        'Unemployment': coefficients_c[3],
+        'GDPGrowth': coefficients_c[4]
+    },
+    'Intercept': intercept_c,
+    'Predicted_Shadow_Economy': predicted_shadow_c.tolist(),
+    'Actual_Composite_Indicator': y_c.tolist(),
+    'Years': china_df['Year'].tolist()
+}
+
+output_c
