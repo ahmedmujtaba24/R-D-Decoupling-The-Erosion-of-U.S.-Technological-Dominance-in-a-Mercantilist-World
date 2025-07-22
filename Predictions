@@ -72,4 +72,30 @@ prob_binary = decimal_to_binary_fraction(prob_decimal, 8)
 prob_binary
 
 _________________________________________________________________________________________________________________________________________________________________
+#Question 3
+#There is a 60% chance that by 2029, U.S. tax revenue as % of GDP will rise above China’s, while maintaining a smaller shadow economy share.
 
+US_tax_rev_mean_2029 = 18.3  # % of GDP
+China_tax_rev_mean_2029 = 11.0  # % of GDP
+
+US_shadow_share_mean_2029 = 6.8  # % of GDP
+China_shadow_share_mean_2029 = 16.5  # % of GDP
+
+std_tax_rev_diff = 3.0  # Hypothetical combined std dev for tax revenue difference
+std_shadow_share_diff = 4.0  # Hypothetical combined std dev for shadow economy share difference
+
+Z_tax = (US_tax_rev_mean_2029 - China_tax_rev_mean_2029) / std_tax_rev_diff
+Z_shadow = (China_shadow_share_mean_2029 - US_shadow_share_mean_2029) / std_shadow_share_diff
+
+prob_tax_above = 1 - norm.cdf(0, loc=US_tax_rev_mean_2029 - China_tax_rev_mean_2029, scale=std_tax_rev_diff)
+
+prob_shadow_above = 1 - norm.cdf(0, loc=China_shadow_share_mean_2029 - US_shadow_share_mean_2029, scale=std_shadow_share_diff)
+
+combined_prob = prob_tax_above * prob_shadow_above
+
+(combined_prob, Z_tax, Z_shadow)
+
+
+_________________________________________________________________________________________________________________________________________________________________
+#Question 4
+# 
