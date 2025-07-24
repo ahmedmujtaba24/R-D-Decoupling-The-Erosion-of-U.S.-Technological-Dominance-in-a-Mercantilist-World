@@ -299,6 +299,24 @@ y_abs_gap = merged_df['Shadow_US_China_Diff']
 model_abs_gap = LinearRegression().fit(X, y_abs_gap)
 abs_gap_2028 = model_abs_gap.predict([[2028]])[0]
 
+# ERP differential data (China minus US, in %)
+data_erp = {
+    'Year': list(range(2014, 2025)),
+    'ERP_Differential': [1.27, 3.24, np.nan, 3.20, 4.30, 3.25, 3.30, 3.65, 3.95, 3.30, 3.25]
+}
+df_erp = pd.DataFrame(data_erp)
+merged_erp_shadow = pd.merge(merged_df, df_erp, on='Year', how='left')
+data_filtered = merged_erp_shadow.dropna(subset=['ERP_Differential'])
+
+X_erp = data_filtered[['Shadow_Share_Gap']]
+y_erp = data_filtered['ERP_Differential']
+model_erp = LinearRegression().fit(X_erp, y_erp)
+
+erp_pred_10_gap = model_erp.predict([[10]])[0]
+
+coefficients = model_erp.coef_[0]
+intercept = model_erp.intercept_
+
 _________________________________________________________________________________________________________________________________________________________________
 #Question 9 
 #
