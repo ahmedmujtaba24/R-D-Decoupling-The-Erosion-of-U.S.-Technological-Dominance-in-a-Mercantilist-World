@@ -142,3 +142,64 @@ real_growth_increase = (projected_real_tax_revenue_increase[-1] - projected_real
 
 real_growth, real_growth_increase
 
+projected_tax_revenue_pct_gdp_high = project_tax_revenue_pct_gdp(0.126, years, 0.03)
+projected_nominal_tax_revenue_high = projected_gdp * projected_tax_revenue_pct_gdp_high
+projected_real_tax_revenue_high = projected_nominal_tax_revenue_high / ((1 + 0.025) ** (years - years[0]))
+real_growth_high = (projected_real_tax_revenue_high[-1] - projected_real_tax_revenue_high[0]) / projected_real_tax_revenue_high[0]
+
+real_growth_high
+
+mean_growth = 0.15927
+std_dev = 0.05 # Assume std deviation of 5 percentage points for yearly growth
+
+from scipy.stats import norm
+
+z_score = (mean_growth - 0.15) / std_dev
+
+prob = 1 - norm.cdf(0.15, loc=mean_growth, scale=std_dev)
+
+z_score, prob
+
+
+_________________________________________________________________________________________________________________________________________________________________
+#Question 5
+# Will China’s shadow economy remain above 15% of its GDP through 2028 despite rising central control and surveillance mechanisms?
+
+import numpy as np
+
+china_shadow_percent = np.array([18.0, 17.6, 17.3, 17.1, 16.8, 16.5, 16.2, 15.9, 15.7, 15.5])
+
+years = np.arange(2014, 2024)
+
+coefficients = np.polyfit(years, china_shadow_percent, 1)
+model = np.poly1d(coefficients)
+
+projection_2028 = model(2028)
+
+residuals = china_shadow_percent - model(years)
+std_dev = np.std(residuals)
+
+lower_bound = projection_2028 - 1.96 * std_dev
+upper_bound = projection_2028 + 1.96 * std_dev
+
+{
+  "projection_2028": projection_2028,
+  "lower_bound": lower_bound,
+  "upper_bound": upper_bound
+}
+
+projection_2028 = 14.02  # percent of GDP
+lower_bound = 13.92
+upper_bound = 14.13
+
+from scipy.stats import norm
+
+std_dev = (upper_bound - projection_2028) / 1.96
+
+z_score = (15 - projection_2028) / std_dev
+
+probability_above_15 = 1 - norm.cdf(z_score)
+
+probability_above_15
+
+_________________________________________________________________________________________________________________________________________________________________
