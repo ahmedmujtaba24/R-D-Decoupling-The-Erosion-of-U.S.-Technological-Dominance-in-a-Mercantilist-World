@@ -261,4 +261,44 @@ result
 
 _________________________________________________________________________________________________________________________________________________________________
 #Question 8
+# Will emerging market equity funds increase U.S. exposure over China by 20%+ between 2025 and 2029 due to lower informality risk premium?
+
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+# Shadow economy (USD trillions)
+data_shadow = {
+    'Year': list(range(2014, 2024)),
+    'US_Shadow_USD_Tn': [1.5329, 1.5551, 1.541, 1.5896, 1.6722, 1.7017, 1.6656, 1.8234, 1.9765, 2.0791],
+    'China_Shadow_USD_Tn': [1.886, 1.947, 1.943, 2.105, 2.334, 2.356, 2.380, 2.833, 2.807, 2.757]
+}
+data_gdp = {
+    'Year': list(range(2014, 2024)),
+    'US_GDP_Tn': [17.608, 18.295, 18.805, 19.612, 20.657, 21.540, 21.354, 23.681, 26.007, 27.721],
+    'China_GDP_Tn': [10.48, 11.06, 11.23, 12.31, 13.89, 14.28, 14.69, 17.82, 17.88, 17.79]
+}
+shadow_df = pd.DataFrame(data_shadow)
+gdp_df = pd.DataFrame(data_gdp)
+merged_df = pd.merge(shadow_df, gdp_df, on='Year')
+
+merged_df['US_Shadow_Share'] = merged_df['US_Shadow_USD_Tn'] / merged_df['US_GDP_Tn'] * 100
+merged_df['China_Shadow_Share'] = merged_df['China_Shadow_USD_Tn'] / merged_df['China_GDP_Tn'] * 100
+
+merged_df['Shadow_Share_Gap'] = merged_df['China_Shadow_Share'] - merged_df['US_Shadow_Share']
+merged_df['Shadow_US_China_Diff'] = merged_df['China_Shadow_USD_Tn'] - merged_df['US_Shadow_USD_Tn']
+
+merged_df['Shadow_Gap_Percent_US_GDP'] = merged_df['Shadow_US_China_Diff'] / merged_df['US_GDP_Tn'] * 100
+
+X = merged_df[['Year']]
+y_gap = merged_df['Shadow_Share_Gap']
+model_gap = LinearRegression().fit(X, y_gap)
+gap_2028 = model_gap.predict([[2028]])[0]
+
+y_abs_gap = merged_df['Shadow_US_China_Diff']
+model_abs_gap = LinearRegression().fit(X, y_abs_gap)
+abs_gap_2028 = model_abs_gap.predict([[2028]])[0]
+
+_________________________________________________________________________________________________________________________________________________________________
+#Question 9 
 #
