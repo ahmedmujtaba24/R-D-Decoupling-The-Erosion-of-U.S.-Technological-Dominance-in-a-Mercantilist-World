@@ -234,3 +234,28 @@ df['PredictedInformalEmp'] = model.predict(X)
 print(df[['Year', 'InformalEmp', 'PredictedInformalEmp']])
 
 _________________________________________________________________________________________________________________________________________________________________
+#Question 7
+# Will the yuan (CNY) depreciate by more than 10% against the dollar by 2028 due to sustained tax inefficiencies and informal leakages?
+
+import numpy as np
+
+current_rate = 7.15
+
+projected_change_min = -0.005  # -0.5%
+projected_change_max = 0.02   # +2%
+
+sensitivity_to_informality = 0.03  # 3% additional depreciation potential over 3 years
+
+depreciation_min = projected_change_min - sensitivity_to_informality
+depreciation_max = projected_change_max - sensitivity_to_informality
+
+likelihood_depreciation_over_10_percent = 0.05  # 5% probability estimate based on data and market consensus
+
+result = {
+    'current_rate': current_rate,
+    'projected_depreciation_min_pct': depreciation_min * 100,
+    'projected_depreciation_max_pct': depreciation_max * 100,
+    'likelihood_depreciation_over_10_percent': likelihood_depreciation_over_10_percent
+}
+result
+
