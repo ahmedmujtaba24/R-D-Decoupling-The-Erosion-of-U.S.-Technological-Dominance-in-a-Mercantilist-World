@@ -203,3 +203,34 @@ probability_above_15 = 1 - norm.cdf(z_score)
 probability_above_15
 
 _________________________________________________________________________________________________________________________________________________________________
+#Question 6 
+# Will the US achieve a shadow economy share below 6.5% of GDP by 2030, aided by AI driven compliance and digital tax compliance
+
+import pandas as pd
+import statsmodels.api as sm
+
+# Data from your submission (2014–2023)
+data = {
+    'Year': list(range(2014, 2024)),
+    'TaxRev': [10.46, 10.9, 11.18, 10.85, 11.5, 9.93, 9.88, 10.15, 11.39, 12.6],
+    'LFPR': [68.754, 68.638, 68.794, 68.715, 68.715, 68.821, 67.396, 67.359, 67.551, 67.552],
+    'Inflation': [1.62, 0.12, 1.26, 2.13, 2.44, 1.81, 1.23, 4.7, 8, 4.12],
+    'Unemp': [7.38, 6.17, 5.28, 4.87, 4.36, 3.9, 3.67, 8.06, 5.35, 3.65],
+    'InformalEmp': [18, 17.6, 17.3, 17.1, 16.8, 16.5, 16.2, 15.9, 15.7, 15.5]
+}
+
+df = pd.DataFrame(data)
+
+X = df[['TaxRev', 'LFPR', 'Inflation', 'Unemp']]
+X = sm.add_constant(X)  # Add constant term
+
+y = df['InformalEmp']
+
+model = sm.OLS(y, X).fit()
+
+print(model.summary())
+
+df['PredictedInformalEmp'] = model.predict(X)
+print(df[['Year', 'InformalEmp', 'PredictedInformalEmp']])
+
+_________________________________________________________________________________________________________________________________________________________________
