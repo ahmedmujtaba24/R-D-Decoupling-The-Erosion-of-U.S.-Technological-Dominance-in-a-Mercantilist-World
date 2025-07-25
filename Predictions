@@ -416,3 +416,33 @@ ________________________________________________________________________________
 #Question 10 
 # Will capital flows to U.S. infrastructure and compliance-tech firms grow 25%+ by 2028 due to demand from global formalization trends?
 
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+data = {
+    'Year': [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+    'RegTech_M&A_billion': [38, 38, 140, 37, 200, None, 350],  # 2024 estimated
+    'Infra_M&A_billion': [None, None, None, None, None, None, None], 
+}
+
+df = pd.DataFrame(data)
+
+df.dropna(inplace=True)
+X = df[['Year']]
+y = np.log(df['RegTech_M&A_billion'])
+
+model = LinearRegression()
+model.fit(X, y)
+
+forecast_year = 2028
+log_forecast = model.predict([[forecast_year]])[0]
+forecast_value = np.exp(log_forecast)
+
+value_2024 = df.loc[df['Year'] == 2024, 'RegTech_M&A_billion'].values[0]
+growth_pct = (forecast_value - value_2024) / value_2024 * 100
+
+print(f"2024 estimated deal value: ${value_2024:.1f} billion")
+print(f"Forecasted 2028 deal value: ${forecast_value:.1f} billion")
+print(f"Projected growth from 2024 to 2028: {growth_pct:.2f}%")
+print(f"Growth exceeds 25%? {'Yes' if growth_pct >= 25 else 'No'}")
