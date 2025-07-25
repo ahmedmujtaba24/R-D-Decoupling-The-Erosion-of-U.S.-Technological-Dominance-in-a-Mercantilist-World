@@ -446,3 +446,61 @@ print(f"2024 estimated deal value: ${value_2024:.1f} billion")
 print(f"Forecasted 2028 deal value: ${forecast_value:.1f} billion")
 print(f"Projected growth from 2024 to 2028: {growth_pct:.2f}%")
 print(f"Growth exceeds 25%? {'Yes' if growth_pct >= 25 else 'No'}")
+
+_________________________________________________________________________________________________________________________________________________________________
+#Question 11
+# Will the yuan (CNY) depreciate by more than 10% against the dollar by 2028 due to sustained tax inefficiencies and informal leakages?
+
+import pandas as pd
+
+data = {
+    'Year': [2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+    'USD_CNY_Spot': [6.162, 6.2827, 6.64, 6.7569, 6.609, 6.9081, 6.9042, 6.4508, 6.729, 7.0809, 7.1957],
+    'China_Tax_Percent_GDP': [9.5, 9.19, 8.95, 9.25, 8.89, 8.33, 7.92, 7.8, 7.52, 7.64, None]
+}
+
+df = pd.DataFrame(data)
+
+usd_cny_2023 = df.loc[df['Year'] == 2023, 'USD_CNY_Spot'].values[0]
+usd_cny_2024 = df.loc[df['Year'] == 2024, 'USD_CNY_Spot'].values[0]
+
+change_2023_2024 = ((usd_cny_2024 - usd_cny_2023) / usd_cny_2023) * 100
+
+df_corr = df.dropna()
+correlation = df_corr['USD_CNY_Spot'].corr(df_corr['China_Tax_Percent_GDP'])
+
+df_corr['Tax_Change'] = df_corr['China_Tax_Percent_GDP'].pct_change()
+df_corr['USD_CNY_Change'] = df_corr['USD_CNY_Spot'].pct_change()
+
+avg_tax_change = df_corr['Tax_Change'].mean()
+avg_usd_cny_change = df_corr['USD_CNY_Change'].mean()
+
+ess_tax_to_fx = avg_usd_cny_change / avg_tax_change if avg_tax_change != 0 else 0
+
+last_tax_val = df_corr.iloc[-1]['China_Tax_Percent_GDP']
+projected_tax_2028 = last_tax_val * ((1 + avg_tax_change) ** 4)
+
+last_usd_cny_spot = df_corr.iloc[-1]['USD_CNY_Spot']
+projected_usd_cny_spot_change = ess_tax_to_fx * (projected_tax_2028 - last_tax_val) / last_tax_val
+
+projected_usd_cny_2028 = last_usd_cny_spot * (1 + projected_usd_cny_spot_change)
+
+percent_depreciation_2024_2028 = ((projected_usd_cny_2028 - usd_cny_2024) / usd_cny_2024) * 100
+
+is_depreciation_over_10_percent = percent_depreciation_2024_2028 > 10
+
+{
+    'change_2023_2024_percent': change_2023_2024,
+    'correlation_tax_fx': correlation,
+    'avg_tax_change': avg_tax_change,
+    'avg_usd_cny_change': avg_usd_cny_change,
+    'elasticity_tax_to_fx': ess_tax_to_fx,
+    'projected_tax_2028': projected_tax_2028,
+    'projected_usd_cny_spot_2028': projected_usd_cny_2028,
+    'percent_depreciation_2024_2028': percent_depreciation_2024_2028,
+    'is_depreciation_over_10_percent': is_depreciation_over_10_percent
+}
+
+_________________________________________________________________________________________________________________________________________________________________
+#Question !2
+# 
