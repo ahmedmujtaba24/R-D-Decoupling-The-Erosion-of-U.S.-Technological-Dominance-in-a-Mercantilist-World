@@ -319,4 +319,100 @@ intercept = model_erp.intercept_
 
 _________________________________________________________________________________________________________________________________________________________________
 #Question 9 
-#
+# Will a shadow economy gap of >10% between China and U.S. lead to a 50 bps equity risk premium differential by 2028?
+
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+data = {
+    'Year': list(range(2014, 2025)),
+    'US_Shadow_Econ_Tn': [1.5329, 1.5551, 1.541, 1.5896, 1.6722, 1.7017, 1.6656, 1.8234, 1.9765, 2.0791, np.nan],
+    'China_Shadow_Econ_Tn': [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan],
+    'US_GDP_Tn': [17.608, 18.295, 18.805, 19.612, 20.657, 21.54, 21.354, 23.681, 26.007, 27.721, np.nan],
+    'China_GDP_Tn': [10.48, 11.06, 11.23, 12.31, 13.89, 14.28, 14.69, 17.82, 17.88, 17.79, np.nan],
+    'US_ERP_Diff': [0.0127, 0.0324, np.nan, 0.032, 0.043, 0.0325, 0.033, 0.0365, 0.0395, 0.033, 0.0325]}
+
+data['China_Shadow_Econ_Tn'] = [1.886, 1.947, 1.943, 2.105, 2.334, 2.356, 2.380, 2.833, 2.807, 2.757, np.nan]
+
+df = pd.DataFrame(data)
+
+non_null_df = df.dropna(subset=['US_Shadow_Econ_Tn', 'China_Shadow_Econ_Tn', 'US_GDP_Tn', 'China_GDP_Tn'])
+
+non_null_df['US_Shadow_Share'] = non_null_df['US_Shadow_Econ_Tn'] / non_null_df['US_GDP_Tn'] * 100
+non_null_df['China_Shadow_Share'] = non_null_df['China_Shadow_Econ_Tn'] / non_null_df['China_GDP_Tn'] * 100
+
+non_null_df['Shadow_Econ_Share_Gap'] = non_null_df['China_Shadow_Share'] - non_null_df['US_Shadow_Share']
+
+non_null_df['Shadow_Econ_Abs_Gap'] = non_null_df['China_Shadow_Econ_Tn'] - non_null_df['US_Shadow_Econ_Tn']
+
+latest_gap_share = non_null_df.iloc[-1]['Shadow_Econ_Share_Gap']
+latest_gap_abs = non_null_df.iloc[-1]['Shadow_Econ_Abs_Gap']
+
+non_null_df['ERP_Diff'] = df['US_ERP_Diff']
+non_null_df = non_null_df.dropna(subset=['ERP_Diff'])
+
+X = non_null_df[['Shadow_Econ_Share_Gap']]
+Y = non_null_df['ERP_Diff']
+model = LinearRegression().fit(X, Y)
+
+erp_pred_10pct_gap = model.predict([[10]])[0]
+
+{
+    'latest_gap_share': latest_gap_share,
+    'latest_gap_abs': latest_gap_abs,
+    'erp_coefficient': model.coef_[0],
+    'erp_intercept': model.intercept_,
+    'erp_pred_10pct_gap': erp_pred_10pct_gap
+}
+
+import matplotlib.pyplot as pltk
+
+plt.figure(figsize=(10,6))
+plt.scatter(non_null_df['Shadow_Econ_Share_Gap'], non_null_df['ERP_Diff'], color='blue', label='Observed Data')
+plt.plot([6, 12], [model.predict([[6]])[0], model.predict([[12]])[0]], color='red', label='Linear Fit')
+plt.xlabel('Shadow Economy Share Gap (China - US) [%]')
+plt.ylabel('Equity Risk Premium Differential (China - US)')
+plt.title('ERP Differential vs Shadow Economy Share Gap')
+plt.legend()
+plt.grid(True)
+plt.show()
+
+__________________________________
+
+import plotly.graph_objects as go
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+x = np.array([7.835,7.809,7.732,7.822,7.801,7.669,7.758,7.888,7.412,7.997])
+y = np.array([0.0127,0.0324,0.032,0.043,0.0325,0.033,0.0365,0.0395,0.033,0.0325])
+years = np.arange(2014, 2024)
+
+x_reshape = x.reshape(-1,1)
+reg = LinearRegression().fit(x_reshape, y)
+y_pred = reg.predict(x_reshape)
+
+sorted_indices = np.argsort(x)
+x_sorted = x[sorted_indices]
+y_pred_sorted = y_pred[sorted_indices]
+
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=x, y=y, mode='markers', 
+                         marker=dict(color='#1FB8CD', size=10),
+                         name='2014-2023', 
+                         showlegend=True))
+fig.add_trace(go.Scatter(x=x_sorted, y=y_pred_sorted, mode='lines', 
+                         line=dict(color='#DB4545', width=3),
+                         name='Regress',
+                         showlegend=True))
+
+fig.update_xaxes(title_text='Shadow Gap [%]', tickformat='.2f', tickfont=dict(size=10), cliponaxis=False)
+fig.update_yaxes(title_text='Equity Prem Diff', tickformat='.3f', tickfont=dict(size=10), cliponaxis=False)
+fig.update_layout(title='Shadow Gap v Equity Diff',
+                  legend=dict(orientation='h', yanchor='bottom', y=1.05, xanchor='center', x=0.5))
+
+fig.write_image('scatter_equity_reg.png')
+_________________________________________________________________________________________________________________________________________________________________
+#Question 10 
+# Will capital flows to U.S. infrastructure and compliance-tech firms grow 25%+ by 2028 due to demand from global formalization trends?
+
