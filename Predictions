@@ -654,6 +654,89 @@ ________________________________________________________________________________
 #Question 14
 # Will U.S. infrastructure capex grow ≥20% by 2028 due to informal-to-formal transitions?
 
+import pandas as pd
+import numpy as np
+from scipy import stats
+
+data = {
+    'Year': [2021, 2022, 2023, 2024],
+    'Jacobs': [21.5, 18.1, 19.5, np.nan],
+    'Fluor': [19.4, 17.9, 18.2, np.nan],
+    'NICE_Actimize': [2.27, 2.62, 2.74, 2.74],
+    'Oracle': [39.1, 42.4, 51, 53],
+    'Palantir': [1.09, 2.23, 2.87, 2.87],
+    'Avalara': [0.238, np.nan, np.nan, np.nan]
+}
+
+capex_df = pd.DataFrame(data)
+
+capex_df = capex_df.ffill().bfill()
+
+capex_df['Infra_Capex'] = capex_df[['Jacobs', 'Fluor']].sum(axis=1)
+
+capex_df['CompTech_Capex'] = capex_df[['NICE_Actimize', 'Oracle', 'Palantir']].sum(axis=1)
+
+capex_df['Total_Capex'] = capex_df['Infra_Capex'] + capex_df['CompTech_Capex']
+
+capex_df['YoY_Growth'] = capex_df['Total_Capex'].pct_change() * 100
+
+start_val = capex_df.loc[capex_df['Year'] == 2021, 'Total_Capex'].values[0]
+end_val = capex_df.loc[capex_df['Year'] == 2023, 'Total_Capex'].values[0]
+cagr_2021_2023 = (end_val / start_val) ** (1/2) - 1  # 2 years growth
+
+n_sims = 10000
+historical_vol = capex_df['YoY_Growth'].std() * 0.75  # Adjusted volatility
+forecast_2028 = []
+
+for _ in range(n_sims):
+    # Mean-reverting growth with noise
+    growth_shock = np.random.normal(cagr_2021_2023, historical_vol)
+    forecast_2028.append(end_val * (1 + growth_shock)**5)  # 5 years to 2028
+
+forecast_2028 = np.array(forecast_2028)
+
+threshold_high = 1.5 * end_val  # 50% growth
+threshold_low = 0.9 * end_val   # 10% contraction
+
+prob_high_growth = np.mean(forecast_2028 >= threshold_high)
+prob_low_growth = np.mean(forecast_2028 <= threshold_low)
+prob_base_case = 1 - prob_high_growth - prob_low_growth
+
+print(f"""
+**Capital Expenditure Regime Analysis (2021-2028)**
+
+*Base Case ({prob_base_case:.0%} probability):*
+- Capex grows at historical CAGR of {cagr_2021_2023:.1%} 
+- Projected 2028 capex: ${np.median(forecast_2028)/1e3:,.1f}B (range ${np.percentile(forecast_2028, 25)/1e3:,.1f}-{np.percentile(forecast_2028, 75)/1e3:,.1f}B)
+
+*Stress Scenarios:*
+1. *Acceleration ({prob_high_growth:.0%} probability):*  
+   - Fiscal stimulus boosts infra spending → capex >${threshold_high/1e3:,.1f}B  
+   - Requires policy shifts (e.g., IIJA expansion)  
+
+2. *Deceleration ({prob_low_growth:.0%} probability):*  
+   - Tech budget cuts → capex <${threshold_low/1e3:,.1f}B  
+   - Would reflect 2022 YoY contraction pattern  
+
+**Sector Breakdown:**
+- Compliance tech share: {capex_df.loc[2023, 'CompTech_Capex']/capex_df.loc[2023, 'Total_Capex']:.1%} in 2023
+- Infrastructure volatility: {capex_df['Infra_Capex'].std():.1f} vs Tech {capex_df['CompTech_Capex'].std():.1f}
+
+**Monitoring Triggers:**
+✓ US infrastructure bill implementation (>70% by 2025)  
+✓ Enterprise software adoption rates (>15% YoY)  
+""")
+
+{
+    "cleaned_data": capex_df,
+    "cagr_2021_2023": cagr_2021_2023,
+    "median_2028_projection": np.median(forecast_2028),
+    "probability_distribution": {
+        "high_growth": prob_high_growth,
+        "base_case": prob_base_case,
+        "low_growth": prob_low_growth
+    }
+}
 
 _________________________________________________________________________________________________________________________________________________________________
 #Question 15 
