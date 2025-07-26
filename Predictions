@@ -912,7 +912,54 @@ ________________________________________________________________________________
 #Question 18
 # Will China’s Energy Intake Exceed 170 quadrillion BTU by 2028 Without a Proportional Increase in Expected Returns Triggering Sovereign Risk Repricing?
 
+import numpy as np
+import plotly.graph_objects as go
 
+n_sim = 10000
+start_val = 162
+cagr_mean = 0.163
+cagr_std = 0.05
+n_years = 5
+threshold = 170
+
+np.random.seed(42)
+cagrs = np.random.normal(loc=cagr_mean, scale=cagr_std, size=n_sim)
+final_vals = start_val * (1 + cagrs) ** n_years
+median_val = np.median(final_vals)
+prob_exceed = np.mean(final_vals > threshold) * 100
+
+fig = go.Figure()
+fig.add_trace(go.Histogram(
+    x=final_vals,
+    marker_color='#1FB8CD',
+    nbinsx=30,
+    name='Projection Distribution'
+))
+fig.add_vline(
+    x=threshold,
+    line_width=3,
+    line_dash='dash',
+    line_color='#DB4545',
+    annotation_text='Threshold',
+    annotation_position='top right'
+)
+fig.add_vline(
+    x=median_val,
+    line_width=3,
+    line_dash='dot',
+    line_color='#2E8B57',
+    annotation_text='Median',
+    annotation_position='top left'
+)
+fig.update_layout(
+    title='China 2028 Energy Intake Projection',
+    xaxis_title='Energy Intake (Quadrillion BTU)',
+    yaxis_title='Frequency',
+    legend=dict(orientation='h', yanchor='bottom', y=1.02)
+)
+fig.show()
+
+print(f"There is a {prob_exceed:.1f}% probability China's energy intake will exceed {threshold} quadrillion BTU by 2028")
 
 _________________________________________________________________________________________________________________________________________________________________
 #Question 19
