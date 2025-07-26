@@ -738,6 +738,20 @@ print(f"""
     }
 }
 
+n_sims = 10000
+forecast_2030 = model.predict([[2030]])[0] + np.random.normal(0, std_error, n_sims)
+prob_gap_gt_10 = np.mean(forecast_2030 > 10) * 100
+prob_gap_gt_10
+
+
+{
+    'median_gap_2030': np.median(forecast_2030),
+    '5th_percentile': np.percentile(forecast_2030, 5),
+    '95th_percentile': np.percentile(forecast_2030, 95),
+    'prob_gap_gt_10': prob_gap_gt_10,
+    'trend_slope': model.coef_[0],
+    'r_squared': model.score(X, y)
+}
 _________________________________________________________________________________________________________________________________________________________________
 #Question 15 
 # Will the U.S. preserve a ≥5 pp lead in STEM enrollment share vs China by 2030?
