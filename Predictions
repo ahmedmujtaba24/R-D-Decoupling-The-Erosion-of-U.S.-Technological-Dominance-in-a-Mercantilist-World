@@ -882,11 +882,35 @@ result
 
 _________________________________________________________________________________________________________________________________________________________________
 #Question 17
+# Will China Surpass the U.S. in Annual AI Patent Filings by 2026 Leading to a Convergence in Tech Risk Premiums?
+ 
+import numpy as np
 
+china_2014_2023_filings = 38210  # cumulative filings 2014-2023
+us_2014_2023_filings = 6276      # cumulative filings 2014-2023
 
+china_2019_filings = 59054
+china_2024_filings = 188757
+years_china_growth = 5
+china_cagr = (china_2024_filings / china_2019_filings) ** (1 / years_china_growth) - 1
+
+us_2019_annual_filings = 32000  # approximate average
+us_2024_annual_filings = 35000  # upper range
+us_cagr = (us_2024_annual_filings / us_2019_annual_filings) ** (1 / years_china_growth) - 1
+
+years_forecast = 2
+china_2026_proj = china_2024_filings * (1 + china_cagr) ** years_forecast
+us_2026_proj = us_2024_annual_filings * (1 + us_cagr) ** years_forecast
+
+china_vs_us_ratio_2026 = china_2026_proj / us_2026_proj
+
+prob_china_surpass = min(0.85, max(0.7, (china_vs_us_ratio_2026 - 1) / 5 + 0.7))  # heuristic
+
+china_cagr, us_cagr, china_2026_proj, us_2026_proj, china_vs_us_ratio_2026, prob_china_surpass * 100
 
 _________________________________________________________________________________________________________________________________________________________________
 #Question 18
+# Will China’s Energy Intake Exceed 170 quadrillion BTU by 2028 Without a Proportional Increase in Expected Returns Triggering Sovereign Risk Repricing?
 
 
 
