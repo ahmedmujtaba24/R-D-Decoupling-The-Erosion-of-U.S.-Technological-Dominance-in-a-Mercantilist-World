@@ -1047,4 +1047,38 @@ fig.show()
 _________________________________________________________________________________________________________________________________________________________________
 #Question 20
 
+import numpy as np
+import matplotlib.pyplot as plt
 
+years = 5  # 2024-2028
+n_sims = 10000
+
+mu_gdp = 0.045     # Annual GDP growth
+sigma_gdp = 0.004
+
+mu_ntl = 0.07      # Annual NTL growth
+sigma_ntl = 0.008
+
+ntl_growth = np.random.normal(mu_ntl, sigma_ntl, (n_sims, years))
+gdp_growth = np.random.normal(mu_gdp, sigma_gdp, (n_sims, years))
+
+annual_gap = ntl_growth - gdp_growth                     # Shape: (n_sims, years)
+all_years_gt_2pp = np.all(annual_gap >= 0.02, axis=1)    # True if gap >=2pp for all years
+prob_all_years_gt_2pp = np.mean(all_years_gt_2pp)
+
+avg_annual_gap = np.mean(annual_gap, axis=1)
+
+print(f"Probability NTL growth exceeds GDP growth by ≥2pp in EVERY year 2024-2028: {prob_all_years_gt_2pp*100:.1f}%")
+print(f"Mean (sim): {avg_annual_gap.mean() * 100:.2f} pp; 95% range: {np.percentile(avg_annual_gap, 2.5)*100:.2f}–{np.percentile(avg_annual_gap, 97.5) * 100:.2f} pp")
+
+plt.figure(figsize=(8,5))
+plt.hist(avg_annual_gap*100, bins=40, color='#1FB8CD', alpha=0.85)
+plt.axvline(x=2, color='red', linestyle='--', label="2pp threshold")
+plt.title("Simulated Avg. Annual NTL-GDP Growth Gap (2024-2028)")
+plt.xlabel("Average Annual Gap (pp, NTL minus GDP)")
+plt.ylabel("Frequency")
+plt.legend()
+plt.show()
+
+_________________________________________________________________________________________________________________________________________________________________
+#Question 21
