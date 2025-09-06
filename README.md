@@ -12,7 +12,7 @@ The project investigates **U.S.–China R&D decoupling**, shadow-economy dynamic
 - **[Predictions](Predictions)** — Math and methodology behind the forecasting pipeline.
 - **[Visuals](Visuals)** — Code to recreate figures and charts used in the write-up.
 - **[Night-time Light Data](night-time-light%20data)** — Google Earth Engine scripts for satellite-based economic proxies.
-- **[Final Report]([night-time-light%20data](https://drive.google.com/file/d/1xdnslJKy-2X3xrZU787914kmzHVmXK8_/view?usp=sharing))** — The Final reports with all the models, predictions and Forecasts.
+- **[Final Report](https://drive.google.com/file/d/1xdnslJKy-2X3xrZU787914kmzHVmXK8_/view?usp=sharing)** — The Final reports with all the models, predictions and Forecasts.
 
 ---
 
